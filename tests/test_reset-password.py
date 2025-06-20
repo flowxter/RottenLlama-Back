@@ -3,6 +3,13 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
 from rest_framework import status
+import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno para pruebas
+load_dotenv(dotenv_path='tests/.env.test')
+
+TEST_PASSWORD = os.getenv('TEST_PASSWORD')
 
 User = get_user_model()
 
@@ -10,7 +17,7 @@ User = get_user_model()
 def test_send_reset_email_to_existing_user():
     client = APIClient()
     email = "testuser@example.com"
-    password = "strongpass123"
+    password = TEST_PASSWORD
     username = "testuser"
     User.objects.create_user(email=email, username=username,password=password)
     

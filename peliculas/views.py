@@ -1,7 +1,6 @@
 from rest_framework import generics
 from .models import Pelicula
 from .serializers import PeliculaSerializer
-""" from django_filters.rest_framework import DjangoFilterBackend  """
 from rest_framework.filters import OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +10,6 @@ from rest_framework import status
 class PeliculaListView(generics.ListAPIView):
     queryset = Pelicula.objects.all()
     serializer_class = PeliculaSerializer
-    """ filter_backends = [DjangoFilterBackend, OrderingFilter] """
     filterset_fields = ['titulo', 'fecha', 'categoria']
     ordering_fields = ['calificacion']
 

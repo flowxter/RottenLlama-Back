@@ -24,14 +24,12 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     @classmethod
 #     def get_token(cls, user):
 #         token = super().get_token(user)
 #         token['username'] = user.username
 #         return token
 
-# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     @classmethod
 #     def get_token(cls, user):
 #         token = super().get_token(user)
@@ -77,9 +75,13 @@ class ResetPasswordSerializer(serializers.Serializer):
     def validate_email(self, value):
         try:
             user = User.objects.get(email=value)
+            # Puedes hacer algo con el usuario aquí si lo necesitas
+            # Por ejemplo, verificar si está activo:
+            if not user.is_active:
+                raise serializers.ValidationError("User account is disabled.")
+            return value
         except User.DoesNotExist:
             raise serializers.ValidationError("No user found with this email address.")
-        return value
 
     def send_reset_email(self, request):  # Asegúrate de pasar el 'request' aquí
         email = self.validated_data["email"]
@@ -98,8 +100,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         # Obtener el dominio completo (por ejemplo: localhost:8000)
         domain = get_current_site(request).domain
 
-        # Construir la URL completa
-        full_url = f"http://{domain}{reset_url}"
+        # Usa HTTPS dinámicamente basado en la solicitud
+        protocol = 'https' if request.is_secure() else 'http'
+        full_url = f"{protocol}://{domain}{reset_url}"
 
         # Enviar el correo con el enlace para restablecer la contraseña
         subject = "Instructions to Reset Your Password"

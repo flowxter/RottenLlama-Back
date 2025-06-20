@@ -1,8 +1,15 @@
 import pytest
+import os
 from django.urls import reverse
 from users.models import CustomUser
 from rest_framework.test import APIClient
 from rest_framework import status
+from dotenv import load_dotenv
+
+# Cargar variables de entorno para pruebas
+load_dotenv(dotenv_path='tests/.env.test')
+
+TEST_PASSWORD = os.getenv('TEST_PASSWORD')
 
 @pytest.fixture
 def api_client():
@@ -13,7 +20,7 @@ def user_data():
     return {
         "email": "test@example.com",
         "username": "testuser",
-        "password": "TestPass123"
+        "password": TEST_PASSWORD
     }
 
 @pytest.fixture
@@ -93,7 +100,7 @@ def test_register_does_not_return_password(api_client, user_data, register_url):
 @pytest.mark.django_db
 def test_password_is_hashed(api_client, user_data, register_url):
     """Verifica que el password no se almacene en texto plano"""
-    response = api_client.post(register_url, user_data)
+    api_client.post(register_url, user_data)
     user = CustomUser.objects.get(email=user_data["email"])
     assert user.password != user_data["password"]
     assert user.check_password(user_data["password"])
@@ -104,7 +111,7 @@ def test_register_invalid_email(api_client, register_url):
     response = api_client.post(register_url, {
         "email": "notanemail",
         "username": "testuser",
-        "password": "TestPass123"
+        "password": TEST_PASSWORD
     })
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "email" in response.data
@@ -148,7 +155,7 @@ def test_create_superuser():
     user = CustomUser.objects.create_superuser(
         email='admin@example.com',
         username='admin',  # Añadir username
-        password='adminpass'
+        password= TEST_PASSWORD
     )
     assert user.is_superuser
     assert user.is_staff

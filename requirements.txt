@@ -17,3 +17,6 @@ djangorestframework-simplejwt>=5.3.0  # JWT authentication
 # Testing
 pytest
 pytest-django
+
+#validation 
+python-dotenv

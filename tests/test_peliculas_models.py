@@ -29,5 +29,5 @@ class TestPeliculaModel:
 
     def test_campos_obligatorios(self):
         with pytest.raises(ValidationError):
-            pelicula = Pelicula()  # Todos los campos son obligatorios
+            pelicula = Pelicula()
             pelicula.full_clean()

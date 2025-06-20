@@ -1,10 +1,18 @@
 # tests/test_auth_views.py
 import pytest
+import os
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 from users.models import CustomUser
+from dotenv import load_dotenv
+
+# Cargar variables de entorno para pruebas
+load_dotenv(dotenv_path='tests/.env.test')
+
+# Contraseñas solo para testing - no son credenciales reales
+TEST_PASSWORD = os.getenv('TEST_PASSWORD')
 
 User = get_user_model()
 
@@ -17,7 +25,7 @@ def valid_user_data():
     return {
         "email": "test@example.com",
         "username": "testuser",
-        "password": "TestPass123!"
+        "password": TEST_PASSWORD
     }
 
 @pytest.mark.django_db
@@ -47,8 +55,8 @@ class TestRegisterView:
 
     def test_register_missing_fields(self, api_client):
         invalid_data = [
-            {"email": "", "username": "test", "password": "Test123!"},
-            {"email": "test@example.com", "username": "", "password": "Test123!"},
+            {"email": "", "username": "test", "password": TEST_PASSWORD},
+            {"email": "test@example.com", "username": "", "password": TEST_PASSWORD},
             {"email": "test@example.com", "username": "test", "password": ""},
         ]
         
@@ -63,13 +71,13 @@ class TestLoginView:
         CustomUser.objects.create_user(
             email="test@example.com",
             username="testuser",
-            password="TestPass123!"
+            password= TEST_PASSWORD
         )
         
         url = reverse('token_obtain_pair')
         response = api_client.post(url, {
             "email": "test@example.com",
-            "password": "TestPass123!"
+            "password": TEST_PASSWORD
         })
         assert response.status_code == status.HTTP_200_OK
         assert 'access' in response.data

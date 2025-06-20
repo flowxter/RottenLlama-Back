@@ -1,4 +1,6 @@
 .env
+*.env
+!/.env.example
 venv/
 users/migrations
 # Ignore Python cache files
